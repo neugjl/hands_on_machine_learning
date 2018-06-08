@@ -42,6 +42,7 @@ def func():
     a = None
 func()
 
+import numpy as np
 b= [1,2,2,3,3,4,5]
 c= b[2:4]
 c[1] = 10
@@ -51,3 +52,12 @@ a_c[1] = 10
 
 import pandas as pd
 obj = pd.Series([4,7,-5,3],index=('a','b','c','d'))
+
+import numpy as np
+from matplotlib import pyplot as plt
+X = np.linspace(-np.pi,np.pi,256,endpoint=True)
+C = np.cos(X)
+S = np.sin(X)
+plt.plot(X,C)
+plt.plot(X,S)
+plt.show()
