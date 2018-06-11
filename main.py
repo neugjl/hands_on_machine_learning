@@ -68,3 +68,44 @@ a = np.ones((3,3))
 spio.savemat('file.mat',{'a':a})
 data = spio.loadmat('file.mat')
 
+from scipy.integrate import quad
+res, err = quad(np.sin,0,np.pi/2)
+check = np.allclose(res,1)
+
+import numpy as np
+from scipy import fftpack
+from matplotlib import pyplot as plt
+time_step = 0.02
+period = 5
+time_vec =  np.arange(0,20,time_step)
+sig = (np.sin(2*np.pi/period*time_vec)+0.5*np.random.rand(time_vec.size))
+plt.figure(figsize=(6,5))
+plt.plot(time_vec,sig,label="Original signal")
+plt.show()
+sig_fft = fftpack.fft(sig)
+power = np.abs(sig_fft)
+sample_freq = fftpack.fftfreq(sig.size, d=time_step)
+plt.figure(figsize=(6, 5))
+plt.plot(sample_freq, power)
+plt.xlabel("Frequency[Hz]")
+plt.ylabel("power")
+#Find the peak frequency, we can focus on only the positive frequencies
+pos_mask = np.where(sample_freq > 0)
+freq = sample_freq[pos_mask]
+peak_freq = freq[power[pos_mask].argmax()]
+#check that it does indeed correspond to the frequency that we generate the signal with
+np.allclose(peak_freq,1./period)
+#An inner plot the show the peak frequency
+axes = plt.axes([0.55,0.3,0.3,0.5])
+plt.title("Peak Frequency")
+plt.plot(freq[:8],power[:8])
+plt.setp(axes,yticks=[])
+high_freq_fft = sig_fft.copy()
+high_freq_fft[np.abs(sample_freq)> peak_freq]=0
+filtered_sig = fftpack.ifft(high_freq_fft)
+plt.figure(figsize=(6,5))
+plt.plot(time_vec,sig,label='Original signal')
+plt.plot(time_vec,filtered_sig,linewidth=3,label='FilteredOriginal signal')
+plt.xlabel('Time [s]')
+plt.ylabel('Amplitude')
+plt.legend(loc='best')
