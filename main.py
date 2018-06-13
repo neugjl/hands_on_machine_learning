@@ -109,3 +109,36 @@ plt.plot(time_vec,filtered_sig,linewidth=3,label='FilteredOriginal signal')
 plt.xlabel('Time [s]')
 plt.ylabel('Amplitude')
 plt.legend(loc='best')
+
+num = [1,2,3]
+num = iter(num)
+num.__iter__()
+
+import numpy as np
+x = np.array([1,2,3],dtype=np.int32)
+x.data
+bytes(x.data)
+np.dtype(int).type
+
+from sklearn import neighbors,datasets
+iris = datasets.load_iris()
+X,y = iris.data,iris.target
+knn = neighbors.KNeighborsClassifier(n_neighbors=1)
+knn.fit(X,y)
+print(iris.target_names[knn.predict([[3,5,4,2]])])
+knn.score(X,y)
+
+from sklearn.datasets import load_digits
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
+digits = load_digits()
+X_train, X_test, y_train,y_test = train_test_split(digits.data,digits.target)
+clf = GaussianNB()
+clf.fit(X_train,y_train)
+predict = clf.predict(X_test)
+expected = y_test
+match = (expected == predict)
+print(match.sum()/len(match))
+print(metrics.classification_report(expected,predict))
+print(metrics.confusion_matrix(expected,predict))
