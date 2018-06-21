@@ -142,3 +142,7 @@ match = (expected == predict)
 print(match.sum()/len(match))
 print(metrics.classification_report(expected,predict))
 print(metrics.confusion_matrix(expected,predict))
+
+from urllib.request import urlopen
+html = urlopen('http://pythonscraping.com/pages/page1.html')
+print(html.read())
