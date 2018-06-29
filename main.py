@@ -146,3 +146,55 @@ print(metrics.confusion_matrix(expected,predict))
 from urllib.request import urlopen
 html = urlopen('http://pythonscraping.com/pages/page1.html')
 print(html.read())
+
+from sklearn.datasets import fetch_mldata
+mnist = fetch_mldata('MNIST original')
+X,y = mnist["data"],mnist["target"]
+X.shape
+y.shape
+import matplotlib
+import matplotlib.pyplot as plt
+some_digit = X[36000]
+some_digit_image = some_digit.reshape(28,28)
+plt.imshow(some_digit_image, cmap=matplotlib.cm.binary, interpolation="nearest")
+plt.axis("off")
+plt.show()
+y[36000]
+
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+
+def plot_learning_curve(model,X,y):
+    fig = plt.figure()
+    X_train, X_val,y_train,y_val = train_test_split(X,y,test_size=0.2)
+    train_errors,val_errors = [],[]
+    for m in range(1,len(X_train)):
+        model.fit(X_train[:m],y_train[:m])
+        y_train_predict = model.predict(X_train[:m])
+        y_val_predict = model.predict(X_val)
+        train_errors.append(mean_squared_error(y_train_predict,y_train[:m]))
+        val_errors.append(mean_squared_error(y_val_predict,y_val))
+    plt.plot(np.square(train_errors),"r-+",linewidth=2,label="train")
+    plt.plot(np.square(val_errors),"b-",linewidth=3,label="val")
+
+polynominal_regression = Pipeline((
+    ("poly_features",PolynomialFeatures(degree=10,include_bias=False)),
+    ("sgd_ref",LinearRegression())
+))
+m=100
+X = 6*np.random.rand(m,1)-3
+y = 0.5 * X**2 + X + 2 + np.random.randn(m,1)
+poly_features = PolynomialFeatures(degree = 2,include_bias=False)
+X_poly = poly_features.fit_transform(X)
+lin_reg = LinearRegression()
+lin_reg.fit(X_poly,y)
+plot_learning_curve(lin_reg,X,y)
+plot_learning_curve(polynominal_regression,X,y)
+fig = plt.figure()
+plt.scatter(X,y)
