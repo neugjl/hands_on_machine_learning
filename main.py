@@ -204,6 +204,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 sample = 100000
 x_rand = np.zeros(sample)
+# as more rand added together, more like randn
 for t in range(3):
     x_rand += np.random.rand(sample)
 x_randn = np.random.randn(sample)
