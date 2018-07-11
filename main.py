@@ -198,3 +198,16 @@ plot_learning_curve(lin_reg,X,y)
 plot_learning_curve(polynominal_regression,X,y)
 fig = plt.figure()
 plt.scatter(X,y)
+
+#Central Limit Theorem
+import numpy as np
+import matplotlib.pyplot as plt
+sample = 100000
+x_rand = np.zeros(sample)
+for t in range(3):
+    x_rand += np.random.rand(sample)
+x_randn = np.random.randn(sample)
+#y = np.arange(0,x.size,1)
+#plt.scatter(y,x)
+#plt.hist(x_randn,bins=100)
+plt.hist(x_rand,bins=100)
