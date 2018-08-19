@@ -212,3 +212,33 @@ x_randn = np.random.randn(sample)
 #plt.scatter(y,x)
 #plt.hist(x_randn,bins=100)
 plt.hist(x_rand,bins=100)
+
+import tensorflow as tf
+#construction phase
+x=tf.Variable(3,name="x")
+y=tf.Variable(4,name="y")
+f=x*x*y+y+2
+#1 native way to do construct excutiion phase
+sess = tf.Session()
+sess.run(x.initializer)
+sess.run(y.initializer)
+result = sess.run(f)
+print(result)
+sess.close()
+#2 use context manager of python which is mentioned in ScipyLectures-simple.pdf
+with tf.Session() as sess:
+    x.initializer.run()
+    y.initializer.run()
+    result2 = f.eval()
+#3 use the global_variables_initializer to create a node in the graph
+init = tf.global_variables_initializer()
+with tf.Session() as sess:
+    init.run()
+    result3=f.eval()
+
+x.graph is tf.get_default_graph()
+init.graph is tf.get_default_graph()
+graphs = tf.Graph()
+with graphs.as_default():
+    x2 = tf.Variable(5,name="x2")
+x2.graph is tf.get_default_graph()
