@@ -242,3 +242,66 @@ graphs = tf.Graph()
 with graphs.as_default():
     x2 = tf.Variable(5,name="x2")
 x2.graph is tf.get_default_graph()
+
+# Linear Regression using Normal equation
+import numpy as np
+from sklearn.datasets import fetch_california_housing
+housing = fetch_california_housing()
+m,n = housing.data.shape
+housing_data_plus_bias = np.c_[np.ones((m,1)),housing.data]
+X = tf.constant(housing_data_plus_bias,dtype=tf.float32,name="X")
+y = tf.constant(housing.target.reshape(-1,1),dtype=tf.float32,name="y")
+XT = tf.transpose(X)
+# no Variable no variable initialization
+theta = tf.matmul(tf.matmul(tf.matrix_inverse(tf.matmul(XT,X)),XT),y)
+with tf.Session() as sess:
+    theta_val = theta.eval()
+    print(theta_val)
+
+#Using Gradient Descent with manually Computing the Gradients
+import tensorflow as tf
+import numpy as np
+from sklearn.datasets import fetch_california_housing
+from sklearn.preprocessing import StandardScaler
+n_epochs = 1000
+learning_rate = 0.001
+housing = fetch_california_housing()
+m,n = housing.data.shape
+housing_data_plus_bias = np.c_[np.ones((m,1)),housing.data]
+scaler = StandardScaler()
+scaled_housing_data_plus_bias = scaler.fit_transform(housing_data_plus_bias)
+housing.target = housing.target.reshape(-1,1)
+batch_size = 100
+n_batches = int(np.ceil(m/batch_size))-2
+def fetch_batch(epoch,batch_index,batch_size):
+    X_batch = scaled_housing_data_plus_bias[batch_index*batch_size:(batch_index+1)*batch_size-1]
+    y_batch = housing.target[batch_index*batch_size:(batch_index+1)*batch_size-1]
+    return X_batch,y_batch
+#X = tf.constant(scaled_housing_data_plus_bias,dtype=tf.float32,name="X")
+#y = tf.constant(housing.target.reshape(-1,1),dtype=tf.float32,name="y")
+X = tf.placeholder(tf.float32,shape=[None,n+1],name="X")
+y = tf.placeholder(tf.float32,shape=[None,1],name="y")
+theta2 = tf.Variable(tf.random_uniform([n+1,1],-1,1),name="theta2")
+y_predict = tf.matmul(X,theta2,name="predition")
+error = y_predict-y
+mse = tf.reduce_mean(tf.square(error),name="mse")
+##gradient =2/m*tf.matmul(tf.transpose(X),error)
+##use the autodiff to calculate the gradient
+#gradient = tf.gradients(mse,[theta2])[0]
+#train_op = tf.assign(theta2, theta2 - learning_rate * gradient)
+#use the audodiff and audo_Optimizer to define the train_op
+optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+train_op = optimizer.minimize(mse)
+init = tf.global_variables_initializer()
+with tf.Session() as sess:
+    sess.run(init)
+    for epoch in range(n_epochs):
+        for batch_index in range(n_batches):
+            X_batch,y_batch = fetch_batch(epoch,batch_index,batch_size)
+            sess.run(train_op,feed_dict={X:X_batch,y:y_batch})
+        #print("epoch",epoch,"theta2",theta2.eval())
+        if epoch%100 ==0:
+            print("epoch",epoch,"mse",sess.run(mse,feed_dict={X:X_batch,y:y_batch}))
+            #print("theta2",theta2.eval())
+    best_theta2 = theta2.eval()
+    print(best_theta2)
