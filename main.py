@@ -272,7 +272,7 @@ scaler = StandardScaler()
 scaled_housing_data_plus_bias = scaler.fit_transform(housing_data_plus_bias)
 housing.target = housing.target.reshape(-1,1)
 batch_size = 100
-n_batches = int(np.ceil(m/batch_size))-2
+n_batches = int(np.ceil(m/batch_size))-1
 def fetch_batch(epoch,batch_index,batch_size):
     X_batch = scaled_housing_data_plus_bias[batch_index*batch_size:(batch_index+1)*batch_size-1]
     y_batch = housing.target[batch_index*batch_size:(batch_index+1)*batch_size-1]
@@ -293,6 +293,7 @@ mse = tf.reduce_mean(tf.square(error),name="mse")
 optimizer = tf.train.GradientDescentOptimizer(learning_rate)
 train_op = optimizer.minimize(mse)
 init = tf.global_variables_initializer()
+saver = tf.train.Saver()
 with tf.Session() as sess:
     sess.run(init)
     for epoch in range(n_epochs):
@@ -302,6 +303,8 @@ with tf.Session() as sess:
         #print("epoch",epoch,"theta2",theta2.eval())
         if epoch%100 ==0:
             print("epoch",epoch,"mse",sess.run(mse,feed_dict={X:X_batch,y:y_batch}))
+            saver.save(sess,"./tmp/my_model.ckpt")
             #print("theta2",theta2.eval())
     best_theta2 = theta2.eval()
+    saver.save(sess,"./tmp/my_final_model.ckpt")
     print(best_theta2)
